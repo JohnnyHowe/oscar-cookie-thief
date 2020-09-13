@@ -1,0 +1,4 @@
+Once a web server is running with main.js
+Paste this into a bookmark
+
+javascript: (function () { Game.LoadMod('localhost\main.js'); }());

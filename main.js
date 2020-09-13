@@ -1,6 +1,6 @@
 let SHOP_UPDATE_FREQ = 0.5;
 let CLICKS_PER_SECOND = 500;
-let GOLD_COOKIE_UPDATE_FREQ = 0.5;
+let SHIMMER_UPDATE_FREQ = 0.5;
 
 
 // Buy the object with the best return when possible
@@ -71,11 +71,13 @@ function collectShimmers() {
 
 // Loop at certain frequency
 function runAtFrequency(code, frequency) {
-    setInterval(code, (1.0 / frequency) / 1000);
+    setInterval(code, (1.0 / frequency) * 1000);
 }
 
 
+// Run it yo
 console.log("Running Johnny's Cheater");
+console.log("Auto clicking, buying (buildings only) and collecting shimmers.");
 runAtFrequency(Game.ClickCookie, CLICKS_PER_SECOND);
 runAtFrequency(storeHandler, SHOP_UPDATE_FREQ);
-runAtFrequency(collectGoldenCookies, GOLD_COOKIE_UPDATE_FREQ);
+runAtFrequency(collectShimmers, SHIMMER_UPDATE_FREQ);

@@ -1,13 +1,15 @@
-let SHOP_UPDATE_FREQ = 0.5;
+let SHOP_UPDATE_FREQ = 1;
 let CLICKS_PER_SECOND = 500;
-let SHIMMER_UPDATE_FREQ = 0.5;
-let WRINKER_POP_FREQ = 0.5;
+let SHIMMER_UPDATE_FREQ = 1;
+let WRINKER_POP_FREQ = 1;
+let CPS_CHECK_FREQ = 0;
+
+let totalCPS;
 
 
 // Buy the object with the best return when possible
 function storeHandler() {
     buyObjectWithBestReturn();
-    // setTimeout(storeHandler, (1.0 / UPDATE_FREQUENCY) / 1000);
 }
 
 
@@ -15,7 +17,10 @@ function storeHandler() {
 function buyObjectWithBestReturn() {
     let object = getObjectWithBestReturn();
     if (object) {
-        object.buy();
+        if (canBuy(object)) {
+            object.buy();
+            buyObjectWithBestReturn(); // Chain buy
+        }
     }
 }
 
@@ -35,24 +40,74 @@ function getAvailableItems() {
 
 // Get the object with the best return
 function getObjectWithBestReturn() {
-    let maxObject;
-    let maxReturn = 0;
+    let availableItems = getAvailableItems();
+    let maxObject = availableItems[0];
 
-    for (let object of getAvailableItems()) {
-        let ret = getReturn(object);
-        if (ret > maxReturn || (ret == maxReturn && object.price < maxObject.price)) {
-            maxReturn = ret;
+    for (let object of availableItems)
+        if (getCPSPerCost(maxObject) < getCPSPerCost(object)) {
             maxObject = object;
         }
-    }
     return maxObject
 }
 
 
-// What's the return on the object?
-function getReturn(object) {
-    let cps = object.cps(object);
-    return cps / object.price;
+// What's the CPS per cost?
+function getCPSPerCost(object) {
+    return getObjectCPS(object) / object.price;
+}
+
+
+// // What object should be bought?
+// // If the cheapest has the best cps per cost, buy that
+// // return best object
+// function compareValue(object1, object2) {
+
+//     // Is what one is cheapest?
+//     let cheapObj = object1;
+//     let expensiveObj = object2;
+//     if (object1.price > object2.price) {
+//         cheapObj = object2;
+//         expensiveObj = object1;
+//     }
+
+//     // Does the cheapest have a higher cps per cost?
+//     if (getCPSperCost(cheapObj) > getCPSperCost(expensiveObj)) {
+//         return cheapObj;
+//     }
+
+//     // Will buying the cheap object get us to the expensive one quicker?
+//     timeToBuyCheap = cheapObj.price / totalCPS;
+//     timeToBuyExpensive = expensiveObj.price / totalCPS;
+
+//     timeToBuyBoth = timeToBuyCheap + timeToBuyExpensive;
+//     timeToBuyBoth *= totalCPS / (totalCPS + getObjectCPS(cheapObj));
+
+//     if (timeToBuyBoth < timeToBuyExpensive) {
+//         return cheapObj;
+//     } else {
+//         return expensiveObj;
+//     }
+// }
+
+
+let lastCookies = Game.cookies;
+let lastUpdateTime = Date.now();
+// Update the totalCPS
+// Includes auto clicking
+function updateTotalCPS() {
+    let currentTime = Date.now() / 1000.0;
+    let currentCookies = Game.cookies;
+    let cookieDiff = currentCookies - lastCookies;
+    let timeDiff = currentTime - lastUpdateTime;
+    totalCPS = cookieDiff / timeDiff;
+    lastCookies = currentCookies;
+    lastUpdateTime = currentTime;
+}
+
+
+// CPS of object?
+function getObjectCPS(obj) {
+    return obj.cps(obj);
 }
 
 
@@ -72,7 +127,9 @@ function collectShimmers() {
 
 // Loop at certain frequency
 function runAtFrequency(code, frequency) {
-    setInterval(code, (1.0 / frequency) * 1000);
+    if (frequency != 0) {
+        setInterval(code, (1.0 / frequency) * 1000);
+    }
 }
 
 
@@ -84,6 +141,12 @@ function popAllWrinklers() {
 }
 
 
+// // Given an avaliable upgrade, parse the desc to get the goods
+// function upgradeParser(upgrade) {
+//     desc = upgrade.desc;
+// }
+
+
 // Run it yo
 console.log("Running Johnny's Cheater");
 console.log("Auto clicking, buying (buildings only) and collecting shimmers.");
@@ -91,3 +154,4 @@ runAtFrequency(Game.ClickCookie, CLICKS_PER_SECOND);
 runAtFrequency(storeHandler, SHOP_UPDATE_FREQ);
 runAtFrequency(collectShimmers, SHIMMER_UPDATE_FREQ);
 runAtFrequency(popAllWrinklers, WRINKER_POP_FREQ);
+runAtFrequency(updateTotalCPS, CPS_CHECK_FREQ);

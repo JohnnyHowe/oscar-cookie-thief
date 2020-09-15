@@ -1,6 +1,7 @@
 let SHOP_UPDATE_FREQ = 0.5;
 let CLICKS_PER_SECOND = 500;
 let SHIMMER_UPDATE_FREQ = 0.5;
+let WRINKER_POP_FREQ = 0.5;
 
 
 // Buy the object with the best return when possible
@@ -75,9 +76,18 @@ function runAtFrequency(code, frequency) {
 }
 
 
+// Pop all wrinklers on screen
+function popAllWrinklers() {
+    for (let wrinkler of Game.wrinklers) {
+        wrinkler.hp = 0;
+    }
+}
+
+
 // Run it yo
 console.log("Running Johnny's Cheater");
 console.log("Auto clicking, buying (buildings only) and collecting shimmers.");
 runAtFrequency(Game.ClickCookie, CLICKS_PER_SECOND);
 runAtFrequency(storeHandler, SHOP_UPDATE_FREQ);
 runAtFrequency(collectShimmers, SHIMMER_UPDATE_FREQ);
+runAtFrequency(popAllWrinklers, WRINKER_POP_FREQ);

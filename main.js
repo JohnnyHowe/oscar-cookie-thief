@@ -1,7 +1,8 @@
 let SHOP_UPDATE_FREQ = 1;
 let CLICKS_PER_SECOND = 500;
-let SHIMMER_UPDATE_FREQ = 1;
-let WRINKER_POP_FREQ = 1;
+let SHIMMER_UPDATE_FREQ = 4;
+let WRINKER_POP_FREQ = 0.1;
+let UPGRADE_PURCHASE_FREQ = 1;
 let CPS_CHECK_FREQ = 0;
 
 let totalCPS;
@@ -147,6 +148,18 @@ function popAllWrinklers() {
 // }
 
 
+// Buy all the upgrades the player can currently afford
+function buyAllUpgrades() {
+    for (let upgrade of Game.UpgradesInStore) {
+        if (!(upgrade.pool === "toggle")) {
+            if (!upgrade.buy()) {
+                return // If buy failed (not enough money), dont bother checking the others
+            }
+        }
+    }
+}
+
+
 // Run it yo
 console.log("Running Johnny's Cheater");
 console.log("Auto clicking, buying (buildings only) and collecting shimmers.");
@@ -155,3 +168,4 @@ runAtFrequency(storeHandler, SHOP_UPDATE_FREQ);
 runAtFrequency(collectShimmers, SHIMMER_UPDATE_FREQ);
 runAtFrequency(popAllWrinklers, WRINKER_POP_FREQ);
 runAtFrequency(updateTotalCPS, CPS_CHECK_FREQ);
+runAtFrequency(buyAllUpgrades, UPGRADE_PURCHASE_FREQ);

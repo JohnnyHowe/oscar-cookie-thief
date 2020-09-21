@@ -135,11 +135,50 @@ function runAtFrequency(code, frequency) {
 
 
 // Pop all wrinklers on screen
-function popAllWrinklers() {
+// function popAllWrinklers() {
+//     for (let wrinkler of Game.wrinklers) {
+//         wrinkler.hp = 0;
+//     }
+// }
+
+
+// Get the fattest wrinker (excluding shiny)
+function getFattestWrinker() {
+    let toPop;
+    let withered = 0;
     for (let wrinkler of Game.wrinklers) {
-        wrinkler.hp = 0;
+        if (wrinkler.type == 0) {
+            if (wrinkler.sucked > withered) {
+                toPop = wrinkler;
+                withered = wrinkler.sucked;
+            }
+        }
+    }
+    return toPop;
+}
+
+
+// How many wrinklers are there?
+function getNumWrinklers() {
+    let n = 0;
+    for (let wrinkler of Game.wrinklers) {
+        if (wrinkler.sucked > 0) {
+            n += 1;
+        }
+    }
+    return n;
+}
+
+
+// Pop the wrinker that has withered the most cookies 
+// With the exception that it is a shiny wrinkler
+function popWrinkers() {
+    if (getNumWrinklers() >= 12) {
+        let fattest = getFattestWrinker();
+        fattest.hp = 0;
     }
 }
+
 
 
 // // Given an avaliable upgrade, parse the desc to get the goods
@@ -166,6 +205,6 @@ console.log("Auto clicking, buying (buildings only) and collecting shimmers.");
 runAtFrequency(Game.ClickCookie, CLICKS_PER_SECOND);
 runAtFrequency(storeHandler, SHOP_UPDATE_FREQ);
 runAtFrequency(collectShimmers, SHIMMER_UPDATE_FREQ);
-runAtFrequency(popAllWrinklers, WRINKER_POP_FREQ);
+runAtFrequency(popWrinkers, WRINKER_POP_FREQ);
 runAtFrequency(updateTotalCPS, CPS_CHECK_FREQ);
 runAtFrequency(buyAllUpgrades, UPGRADE_PURCHASE_FREQ);

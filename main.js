@@ -201,8 +201,8 @@ function buyAllUpgrades() {
 
 // Run it yo
 console.log("Running Johnny's Cheater");
-console.log("Auto clicking, buying (buildings only) and collecting shimmers.");
-runAtFrequency(Game.ClickCookie, CLICKS_PER_SECOND);
+// console.log("Auto clicking, buying (buildings only) and collecting shimmers.");
+// runAtFrequency(Game.ClickCookie, CLICKS_PER_SECOND);
 runAtFrequency(storeHandler, SHOP_UPDATE_FREQ);
 runAtFrequency(collectShimmers, SHIMMER_UPDATE_FREQ);
 runAtFrequency(popWrinkers, WRINKER_POP_FREQ);

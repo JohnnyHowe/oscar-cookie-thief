@@ -1,4 +1,8 @@
-Once a web server is running with main.js
-Paste this into a bookmark
+To run the bot in chrome.
 
-javascript: (function () { Game.LoadMod('localhost\main.js'); }());
+1.  Paste the following into a bookmark
+    javascript: (function () { Game.LoadMod('https://johnnyhowe.github.io/OscarCookieThief/main.js'); }());
+2.  Open cookie clicker
+3.  Click bookmark
+4.  Boom
+

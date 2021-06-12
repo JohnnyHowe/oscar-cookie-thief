@@ -6,3 +6,9 @@ To run the bot in chrome.
 3.  Click bookmark
 4.  Boom
 
+Or
+1. Open cookie clicker
+2. Open JS console (ctrl + shift + j)
+3. Paste Game.LoadMod('https://johnnyhowe.github.io/OscarCookieThief/main.js') into console
+4. Press enter
+5. Boom

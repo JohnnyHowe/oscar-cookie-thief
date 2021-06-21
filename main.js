@@ -19,10 +19,18 @@ function buyObjectWithBestReturn() {
     let object = getObjectWithBestReturn();
     if (object) {
         if (canBuy(object)) {
-            object.buy();
+            buy(object)
             buyObjectWithBestReturn(); // Chain buy
         }
     }
+}
+
+// Ensures game in buy mode and buys object
+function buy(object) {
+    let old = Game.buyMode
+    Game.buyMode = 1;
+    object.buy()
+    Game.buyMode = old;
 }
 
 
@@ -56,39 +64,6 @@ function getObjectWithBestReturn() {
 function getCPSPerCost(object) {
     return getObjectCPS(object) / object.price;
 }
-
-
-// // What object should be bought?
-// // If the cheapest has the best cps per cost, buy that
-// // return best object
-// function compareValue(object1, object2) {
-
-//     // Is what one is cheapest?
-//     let cheapObj = object1;
-//     let expensiveObj = object2;
-//     if (object1.price > object2.price) {
-//         cheapObj = object2;
-//         expensiveObj = object1;
-//     }
-
-//     // Does the cheapest have a higher cps per cost?
-//     if (getCPSperCost(cheapObj) > getCPSperCost(expensiveObj)) {
-//         return cheapObj;
-//     }
-
-//     // Will buying the cheap object get us to the expensive one quicker?
-//     timeToBuyCheap = cheapObj.price / totalCPS;
-//     timeToBuyExpensive = expensiveObj.price / totalCPS;
-
-//     timeToBuyBoth = timeToBuyCheap + timeToBuyExpensive;
-//     timeToBuyBoth *= totalCPS / (totalCPS + getObjectCPS(cheapObj));
-
-//     if (timeToBuyBoth < timeToBuyExpensive) {
-//         return cheapObj;
-//     } else {
-//         return expensiveObj;
-//     }
-// }
 
 
 let lastCookies = Game.cookies;
@@ -134,14 +109,6 @@ function runAtFrequency(code, frequency) {
 }
 
 
-// Pop all wrinklers on screen
-// function popAllWrinklers() {
-//     for (let wrinkler of Game.wrinklers) {
-//         wrinkler.hp = 0;
-//     }
-// }
-
-
 // Get the fattest wrinker (excluding shiny)
 function getFattestWrinker() {
     let toPop;
@@ -180,17 +147,10 @@ function popWrinkers() {
 }
 
 
-
-// // Given an avaliable upgrade, parse the desc to get the goods
-// function upgradeParser(upgrade) {
-//     desc = upgrade.desc;
-// }
-
-
 // Buy all the upgrades the player can currently afford
 function buyAllUpgrades() {
     for (let upgrade of Game.UpgradesInStore) {
-        if (!(upgrade.pool === "toggle")) {
+        if (upgrade.pool !== "toggle") {
             if (!upgrade.buy()) {
                 return // If buy failed (not enough money), dont bother checking the others
             }

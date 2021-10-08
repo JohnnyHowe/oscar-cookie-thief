@@ -1,3 +1,4 @@
+
 let SHOP_UPDATE_FREQ = 1;
 let CLICKS_PER_SECOND = 500;
 let SHIMMER_UPDATE_FREQ = 4;
@@ -8,24 +9,65 @@ let CPS_CHECK_FREQ = 0;
 let totalCPS;
 
 
-// Buy the object with the best return when possible
-function storeHandler() {
-    buyObjectWithBestReturn();
-}
+// ===============================================================================================
+// Store
+// ===============================================================================================
 
-
-// Buy the item with the best return
-function buyObjectWithBestReturn() {
-    let object = getObjectWithBestReturn();
-    if (object) {
+function updateStore() {
+    let bestObject = getBestBuyable();
+    if (bestObject) {
         if (canBuy(object)) {
-            buy(object)
-            buyObjectWithBestReturn(); // Chain buy
+            buy(object);
+            updateStore()
         }
     }
 }
 
-// Ensures game in buy mode and buys object
+/**
+ * Find the best buyable and return it
+ * Object returned is the cookie clicker buyable
+ */
+function getBestBuyable() {
+
+    // TODO allow upgrades - only works for buildings right now
+    let availableItems = getAvailableItems();
+    let maxObject = availableItems[0];
+
+    for (let object of availableItems)
+        maxObject = superiorBuyable(maxObject, object)
+
+    return maxObject
+}
+
+/**
+ * Given two buyables, return the best one
+ */
+function superiorBuyable(buyable1, buyable2) {
+    // TODO make better
+    if (getCPSIncrease(buyable1) / getCost(buyable1) > getCPSIncrease(buyable2) / getCost(buyable2)) {
+        return buyable1;
+    } else {
+        return buyable2;
+    }
+}
+
+/**
+ * For any buyable, get the percentage increase that buying it will give
+ */
+function getCPSIncrease(buyable) {
+    // TODO make work with upgrades
+}
+
+/**
+ * For any buyable, get the percentage increase that buying it will give
+ */
+function getCost(buyable) {
+    // TODO make work with upgrades
+}
+
+/** 
+ * Ensures game in buy mode and buys object
+ */
 function buy(object) {
     let old = Game.buyMode
     Game.buyMode = 1;
@@ -33,8 +75,9 @@ function buy(object) {
     Game.buyMode = old;
 }
 
-
-// What items can we buy?
+/**
+ * What items can we buy?
+ */
 function getAvailableItems() {
     let items = [];
     for (let name in Game.Objects) {
@@ -46,25 +89,16 @@ function getAvailableItems() {
     return items;
 }
 
-
-// Get the object with the best return
-function getObjectWithBestReturn() {
-    let availableItems = getAvailableItems();
-    let maxObject = availableItems[0];
-
-    for (let object of availableItems)
-        if (getCPSPerCost(maxObject) < getCPSPerCost(object)) {
-            maxObject = object;
-        }
-    return maxObject
+/**
+ * Do we have enough cookies for this?
+ */
+function canBuy(object) {
+    return object.price <= Game.cookies;
 }
 
-
-// What's the CPS per cost?
-function getCPSPerCost(object) {
-    return getObjectCPS(object) / object.price;
-}
-
+// ===============================================================================================
+// Not Store
+// ===============================================================================================
 
 let lastCookies = Game.cookies;
 let lastUpdateTime = Date.now();
@@ -79,19 +113,6 @@ function updateTotalCPS() {
     lastCookies = currentCookies;
     lastUpdateTime = currentTime;
 }
-
-
-// CPS of object?
-function getObjectCPS(obj) {
-    return obj.cps(obj);
-}
-
-
-// Can we buy this item?
-function canBuy(object) {
-    return object.price <= Game.cookies;
-}
-
 
 // Collect all the shimmers on the screen (gold, wrath cookies and wrinklers)
 function collectShimmers() {
@@ -161,10 +182,9 @@ function buyAllUpgrades() {
 
 // Run it yo
 console.log("Running Johnny's Cheater");
-console.log("Auto clicking, buying (buildings only) and collecting shimmers.");
-runAtFrequency(Game.ClickCookie, CLICKS_PER_SECOND);
-runAtFrequency(storeHandler, SHOP_UPDATE_FREQ);
-runAtFrequency(collectShimmers, SHIMMER_UPDATE_FREQ);
-runAtFrequency(popWrinkers, WRINKER_POP_FREQ);
-runAtFrequency(updateTotalCPS, CPS_CHECK_FREQ);
-runAtFrequency(buyAllUpgrades, UPGRADE_PURCHASE_FREQ);
+// runAtFrequency(Game.ClickCookie, CLICKS_PER_SECOND);
+runAtFrequency(updateStore, SHOP_UPDATE_FREQ);
+// runAtFrequency(collectShimmers, SHIMMER_UPDATE_FREQ);
+// runAtFrequency(popWrinkers, WRINKER_POP_FREQ);
+// runAtFrequency(updateTotalCPS, CPS_CHECK_FREQ);
+// runAtFrequency(buyAllUpgrades, UPGRADE_PURCHASE_FREQ);

@@ -1,15 +1,37 @@
 let SHOP_UPDATE_FREQ = 1;
 let CLICKS_PER_SECOND = 100;
-// let SHIMMER_UPDATE_FREQ = 4;
-// let WRINKER_POP_FREQ = 0.1;
-// let UPGRADE_PURCHASE_FREQ = 1;
-// let CPS_CHECK_FREQ = 0;
+let SHIMMER_UPDATE_FREQ = 1;
 
-// let totalCPS;
 
-let kittenMilkFactors = {
+let KITTEN_MILK_FACTORS = {
     "Kitten helpers": 0.1,
 }
+
+let BAD_SHIMMER_NAMES = [
+    "Ruin!",
+    "Clot",
+    "Cursed Finger",    // While this is good, we can't consider it due to the way it stacks
+
+    // Building debuffs
+    "Slap to the face",
+    "Senility",
+    "Locusts",
+    "Cave-in",
+    "Jammed machinery",
+    "Recession",
+    "Crisis of faith",
+    "Magivores",
+    "Black holes",
+    "Lab disaster",
+    "Dimensional calamity",
+    "Time jam",
+    "Predictable tragedy",
+    "Eclipse",
+    "Dry spell",
+    "Microcosm",
+    "Antipattern",
+    "Big crunch",
+];
 
 let unknownStrings = [];
 
@@ -199,30 +221,61 @@ function getMultiplier(change) {
 }
 
 // ===============================================================================================
+// Grimoire
+// ===============================================================================================
+
+/**
+ * Do the Grimoire golden cookie strategy if we can
+ * 
+ * When a golden cookie is giving us a boost, try buy two more using the Grimoire minigame
+ */
+function handOfFateStrategyUpdate() {
+    let minigame = Game.Objects["Wizard tower"].minigame;
+    let spell = minigame.spells["hand of fate"];
+    // minigame.castSpell(minigame.spells["hand of fate"]
+
+    if (minigame) {
+        // Do we have enough magic?
+        if (minigame.magic < spell.costMin + spell.costPercent * minigame.magicM) return;
+
+        // Are we able to use another sugar lump to get more magic? 
+        // (has it been 15 minutes since we last did this)
+        if (Game.lumpRefill > 0) return;
+
+        // Cast one spell
+        minigame.castSpell(minigame.spells["hand of fate"]);
+
+        // Do we have two good buffs?
+        if (numGoodBuffs() < 2) return;
+
+        // Cast second spell
+        minigame.castSpell(minigame.spells["hand of fate"]);
+    }
+}
+
+function numGoodBuffs() {
+    let count = 0;
+    for (let buff in Game.buffs) {
+        if (!BAD_SHIMMER_NAMES.includes(buff)) {
+            count += 1;
+        }
+    }
+    return count;
+}
+
+// ===============================================================================================
 // Not Store
 // ===============================================================================================
 
-// let lastCookies = Game.cookies;
-// let lastUpdateTime = Date.now();
-// // Update the totalCPS
-// // Includes auto clicking
-// function updateTotalCPS() {
-//     let currentTime = Date.now() / 1000.0;
-//     let currentCookies = Game.cookies;
-//     let cookieDiff = currentCookies - lastCookies;
-//     let timeDiff = currentTime - lastUpdateTime;
-//     totalCPS = cookieDiff / timeDiff;
-//     lastCookies = currentCookies;
-//     lastUpdateTime = currentTime;
-// }
-
-// // Collect all the shimmers on the screen (gold, wrath cookies and wrinklers)
-// function collectShimmers() {
-//     for (let shimmer of Game.shimmers) {
-//         shimmer.pop();
-//     }
-// }
-
+/** 
+ * Collect all the shimmers on the screen (gold, wrath cookies)
+ */
+function collectShimmers() {
+    for (let shimmer of Game.shimmers) {
+        shimmer.pop();
+        handOfFateStrategyUpdate();
+    }
+}
 
 
 // // Get the fattest wrinker (excluding shiny)
@@ -286,10 +339,7 @@ function runAtFrequency(code, frequency) {
 
 
 // // Run it yo
-// console.log("Running Johnny's Cheater");
+console.log("Running Johnny's Cheater");
 runAtFrequency(Game.ClickCookie, CLICKS_PER_SECOND);
 runAtFrequency(updateStore, SHOP_UPDATE_FREQ);
-// // runAtFrequency(collectShimmers, SHIMMER_UPDATE_FREQ);
-// // runAtFrequency(popWrinkers, WRINKER_POP_FREQ);
-// // runAtFrequency(updateTotalCPS, CPS_CHECK_FREQ);
-// // runAtFrequency(buyAllUpgrades, UPGRADE_PURCHASE_FREQ);
+runAtFrequency(collectShimmers, SHIMMER_UPDATE_FREQ);

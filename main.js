@@ -235,6 +235,9 @@ function handOfFateStrategyUpdate() {
     // minigame.castSpell(minigame.spells["hand of fate"]
 
     if (minigame) {
+        // Is there a buff active?
+        if (numGoodBuffs() < 1) return;
+
         // Do we have enough magic?
         if (minigame.magic < spell.costMin + spell.costPercent * minigame.magicM) return;
 
@@ -246,7 +249,10 @@ function handOfFateStrategyUpdate() {
         minigame.castSpell(minigame.spells["hand of fate"]);
 
         // Do we have two good buffs?
-        if (numGoodBuffs() < 2) return;
+        if (numGoodBuffs() < 2) {
+            console.log("Aborting hand of fate strategy, less than 2 good buffs active.");
+            return;
+        };
 
         // Cast second spell
         minigame.castSpell(minigame.spells["hand of fate"]);
